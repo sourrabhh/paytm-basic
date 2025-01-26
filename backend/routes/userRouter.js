@@ -1,20 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware');
-const {signupValidation, updateBodyValidation}  = require('../zodvalidation/zodValidation');  
+const {signupValidation, updateBodyValidation, signinValidation}  = require('../zodvalidation/zodValidation');  
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = require('../config');
 const {User, Account} = require('../db');
 // const Account = require('../db');
-
-    router.get('/', (req, res) => {
-        res.send('Sign-in endpoint not implemented yet!');
-    });
-
-    router.get('/signin', (req, res) => {
-        res.send('Sign-in endpoint not implemented yet!');
-    });
 
     // signup route 
     router.post('/signup', async (req, res) => {
@@ -64,6 +56,36 @@ const {User, Account} = require('../db');
         })
     });
 
+    // signin route
+    router.get('/signin', async (req, res) => {
+        const {success} = signinValidation.safeParse(req.body);
+        if(!success) {
+            return res.status(411).json({
+                message: "Email already taken / Incorrect inputs"
+            })
+        }
+
+        const user = await User.findOne({
+            username: req.body.username,
+            password: req.body.password
+        });
+
+        if(user) {
+            const token = jwt.sign({
+                userId: user._id
+            }, JWT_SECRET);
+
+            res.json({
+                token: token
+            })
+            return
+        }
+
+        res.status(411).json({
+            message: "Error while logging in"
+        })
+    });
+
     // for getting the user based on search string
     router.get('/bulkuser', async (req, res) => {
         const filter = req.query.filter || '';
@@ -99,7 +121,7 @@ const {User, Account} = require('../db');
             })
         }
 
-        await User.updateOne({ id: req.userId }, req.body, )
+        await User.updateOne({ id: req.userId }, req.body )
 
         res.json({
             message: "Updated Successfully"

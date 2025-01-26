@@ -7,9 +7,14 @@ const signupValidation = z.object({
     lastName: z.string(),
 });
 
+const signinValidation = z.object({
+    username: z.string().email(),
+    password: z.string()
+});
+
 const updateBodyValidation = z.object({
     username: z.string().email().optional(),
     password: z.string().optional(),
 });
 
-module.exports = {signupValidation, updateBodyValidation}
+module.exports = {signupValidation, signinValidation, updateBodyValidation}
