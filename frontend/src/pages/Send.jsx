@@ -13,6 +13,37 @@ const Send = () => {
   const id = searchParam.get("id");
   const name = searchParam.get("name");
 
+  const handleTransfer = async () => {
+    try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("You are not logged in. Please log in again.");
+            return;
+        }
+
+        const numericAmount = Number(amount);
+        if (isNaN(numericAmount) || numericAmount <= 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+      const response = await axios.post('http://localhost:3000/api/v1/account/transfer', {
+        to: id,
+        amount: numericAmount
+      },
+      {
+        headers: {
+          Authorization: 'Bearer '+ localStorage.getItem("token")
+        }
+      });
+      console.log("Response: ", response.data);
+      alert(response.data.message);
+    } catch (error) {
+      console.log(error)
+      alert(error.response?.data?.message || "Transfer failed.");
+    }
+  }
+
   return (
     <div className="bg-slate-200 h-screen flex justify-center">
       <div className="flex flex-col justify-center">
@@ -27,22 +58,11 @@ const Send = () => {
             </div>
           </div>
           <Inputbox onChange={ (e) => {
-              setAmount(Number(e.target.value))
+              setAmount(e.target.value)
             }} label={"Amount in (RS)"} placeholder={"Enter Amount"} />
           <div className="mt-2 w-full ">
-            <button onClick={
-               (e) => {
-                axios.post('http://localhost:3000/api/v1/account/transfer', {
-                  to: id,
-                  amount
-                },
-              {
-                headers: {
-                  Authorization: "Bearer " + localStorage.getItem("token")
-                }
-              })
-            }} 
-            className="w-full py-2 px-4 rounded-sm font-bold text-sm bg-green-500 text-white">
+            <button onClick={ handleTransfer } 
+              className="w-full py-2 px-4 rounded-sm font-bold text-sm bg-green-500 text-white">
               Transfer
             </button>
           </div>

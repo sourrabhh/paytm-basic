@@ -55,7 +55,7 @@ const {User, Account} = require('../db');
     });
 
     // signin route
-    router.get('/signin', async (req, res) => {
+    router.post('/signin', async (req, res) => {
         const {success} = signinValidation.safeParse(req.body);
         if(!success) {
             return res.status(411).json({

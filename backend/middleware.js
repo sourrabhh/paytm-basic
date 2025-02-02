@@ -5,26 +5,19 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if(!authHeader ||  !authHeader.startsWith('Bearer')) {
+        console.log("Header is not correct");
         return res.status(403).json({});
     }
 
     const token = authHeader.split(' ')[1];
+    console.log(token);
 
     try {
         const decode = jwt.verify(token, JWT_SECRET);
-        if(decode.userId)
-        {
-            req.userId = decode.userId;
-            next();
-        }
-        else{
-            return res.status(403).json({
-                message: 'Invalid Token: userId missing'
-            });
-        }
-        
+        req.userId = decode.userId;
+        next()
     } catch (error) {
-        return res.status(403).json({});
+        return res.status(403).json({'message' : "In Catch block of authMiddleware"});
     }
 }
 
