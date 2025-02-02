@@ -3,15 +3,19 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
 import Button from "./Button";
+import {useNavigate} from 'react-router-dom';
 
 const Users = () => {
+
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
+
+    // debouncing need to be done 
 
     useEffect(() => {
         // Only make API call if filter has some value
         if (filter.trim()) {
-            axios.get(`http://localhost:3000/api/v1/user/bulkuser?filter=${filter}`)
+            axios.get(`http://localhost:3000/api/v1/user/bulkuser?filter=`+filter)
                 .then(response => {
                     setUsers(response.data.user);
                 })
@@ -39,6 +43,9 @@ const Users = () => {
 }
 
 function User({user}) {
+
+    const navigate = useNavigate();
+
     return(
         <div className="flex justify-between">
             <div className="flex">
@@ -55,7 +62,9 @@ function User({user}) {
             </div>
 
             <div className="p-2 mr-4 flex flex-col h-full justify-center">
-                <Button label={"Send Money"} />
+                <Button onClick={() => {
+                    navigate('/send?id=' +user._id +"&name=" +user.firstName)
+                }} label={"Send Money"} />
             </div>
 
         </div>
