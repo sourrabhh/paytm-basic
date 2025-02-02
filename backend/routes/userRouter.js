@@ -10,10 +10,8 @@ const {User, Account} = require('../db');
 
     // signup route 
     router.post('/signup', async (req, res) => {
-        const body = req.body;
-        
+        const body = req.body;     
         const {success} = signupValidation.safeParse(req.body);
-
         if(!success) {
             return res.json({
                 message: "Incorrect Input"
@@ -88,7 +86,7 @@ const {User, Account} = require('../db');
 
     // for getting the user based on search string
     router.get('/bulkuser', async (req, res) => {
-        const filter = req.query.filter || '';
+        const filter = req.query.filter ;
 
         const users = await User.find({
             $or: [{
@@ -121,7 +119,7 @@ const {User, Account} = require('../db');
             })
         }
 
-        await User.updateOne({ id: req.userId }, req.body )
+        await User.updateOne(req.body , { id: req.userId } )
 
         res.json({
             message: "Updated Successfully"
